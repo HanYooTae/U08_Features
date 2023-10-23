@@ -24,7 +24,7 @@ private:
 
 private:
 	TArray<FVector> Positions;
-	TArray<int32> Indices;
+	TArray<int32> Indices; //Todo. 왜 uint가 아니게?
 	TArray<FVector> Normals;
 	TArray<FVector2D> UVs;
 	TArray<FColor> Colors;

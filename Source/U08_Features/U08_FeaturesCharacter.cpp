@@ -1,6 +1,7 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "U08_FeaturesCharacter.h"
+#include "Global.h"
 #include "UObject/ConstructorHelpers.h"
 #include "Camera/CameraComponent.h"
 #include "Components/DecalComponent.h"
@@ -11,7 +12,6 @@
 #include "HeadMountedDisplayFunctionLibrary.h"
 #include "Materials/Material.h"
 #include "Engine/World.h"
-#include "Global.h"
 
 AU08_FeaturesCharacter::AU08_FeaturesCharacter()
 {
@@ -86,9 +86,7 @@ void AU08_FeaturesCharacter::Tick(float DeltaSeconds)
 			FRotator CursorR = CursorFV.Rotation();
 			CursorToWorld->SetWorldLocation(TraceHitResult.Location);
 			CursorToWorld->SetWorldRotation(CursorR);
-			
-			CLog::Print(TraceHitResult.Location);
 		}
-
 	}
+	
 }

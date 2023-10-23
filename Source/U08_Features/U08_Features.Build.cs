@@ -8,8 +8,10 @@ public class U08_Features : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
-        PublicIncludePaths.Add(ModuleDirectory);
-
         PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "HeadMountedDisplay", "NavigationSystem", "AIModule", "ProceduralMeshComponent" });
+
+		PublicIncludePaths.Add(ModuleDirectory);
     }
+
+	
 }

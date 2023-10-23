@@ -1,6 +1,6 @@
 #include "CVertexMesh.h"
-#include "ProceduralMeshComponent.h"
 #include "Global.h"
+#include "ProceduralMeshComponent.h"
 
 ACVertexMesh::ACVertexMesh()
 {
@@ -33,11 +33,22 @@ ACVertexMesh::ACVertexMesh()
 	Indices.Add(2);
 	Indices.Add(1);
 	Indices.Add(0);
+
 	Indices.Add(3);
 	Indices.Add(1);
 	Indices.Add(2);
-
-	ProcMesh->CreateMeshSection(0, Positions, Indices, Normals, UVs, Colors, TArray<FProcMeshTangent>(), true);
+	
+	ProcMesh->CreateMeshSection
+	(
+		0,
+		Positions,
+		Indices,
+		Normals,
+		UVs,
+		Colors,
+		TArray<FProcMeshTangent>(),
+		true
+	);
 }
 
 void ACVertexMesh::BeginPlay()

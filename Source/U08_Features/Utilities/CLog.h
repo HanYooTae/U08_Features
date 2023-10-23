@@ -2,7 +2,7 @@
 
 #include "CoreMinimal.h"
 
-#define PrintLine() { CLog::Log(__FUNCTION__, __LINE__); };
+#define PrintLine() { CLog::Log(__FUNCTION__, __LINE__); }
 
 class U08_FEATURES_API CLog
 {

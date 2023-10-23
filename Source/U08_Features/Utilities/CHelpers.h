@@ -3,9 +3,9 @@
 #include "CoreMinimal.h"
 #include "Engine/World.h"
 
-//--------------------------------------------------------------------------------
-// Macros
-//--------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+//Macros
+//-----------------------------------------------------------------------------
 #define CheckNull(p) { if ((p) == nullptr) return; }
 #define CheckNullResult(p, result) { if ((p) == nullptr) return result; }
 
@@ -15,10 +15,9 @@
 #define CheckFalse(p) { if ((p) == false) return; }
 #define CheckFalseResult(p, result) { if ((p) == false) return result; }
 
-
-//--------------------------------------------------------------------------------
-// CHelpers
-//--------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+//CHelpers
+//-----------------------------------------------------------------------------
 class U08_FEATURES_API CHelpers
 {
 public:
@@ -27,6 +26,7 @@ public:
 	{
 		ConstructorHelpers::FObjectFinder<T> asset(*InPath);
 		verifyf(asset.Succeeded(), L"Asset Not Found");
+		
 		*OutAsset = asset.Object;
 	}
 
@@ -44,19 +44,20 @@ public:
 	{
 		ConstructorHelpers::FClassFinder<T> asset(*InPath);
 		verifyf(asset.Succeeded(), L"Class Not Found");
-			*OutClass = asset.Class;
+		*OutClass = asset.Class;
 	}
 
 	template<typename T>
 	static void CreateSceneComponent(AActor* InActor, T** OutComp, FName InName, USceneComponent* InParent = nullptr)
 	{
 		*OutComp = InActor->CreateDefaultSubobject<T>(InName);
+
 		if (!!InParent)
 		{
 			(*OutComp)->SetupAttachment(InParent);
 			return;
 		}
-
+		
 		InActor->SetRootComponent(*OutComp);
 	}
 
@@ -71,5 +72,4 @@ public:
 	{
 		return Cast<T>(InActor->GetComponentByClass(T::StaticClass()));
 	}
-
 };
