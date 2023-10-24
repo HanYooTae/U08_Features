@@ -11,6 +11,7 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "HeadMountedDisplayFunctionLibrary.h"
 #include "Materials/Material.h"
+#include "Materials/MaterialInstanceDynamic.h"
 #include "Engine/World.h"
 
 AU08_FeaturesCharacter::AU08_FeaturesCharacter()
@@ -58,6 +59,14 @@ AU08_FeaturesCharacter::AU08_FeaturesCharacter()
 	PrimaryActorTick.bStartWithTickEnabled = true;
 }
 
+void AU08_FeaturesCharacter::BeginPlay()
+{
+	Super::BeginPlay();
+
+	DynamicMaterial = UMaterialInstanceDynamic::Create(GetMesh()->GetMaterial(0), nullptr);
+	GetMesh()->SetMaterial(0, DynamicMaterial);
+}
+
 void AU08_FeaturesCharacter::Tick(float DeltaSeconds)
 {
     Super::Tick(DeltaSeconds);
@@ -89,4 +98,7 @@ void AU08_FeaturesCharacter::Tick(float DeltaSeconds)
 		}
 	}
 	
+	CheckNull(DynamicMaterial);
+	DynamicMaterial->SetScalarParameterValue("Amount", GetVelocity().Size() * 0.2f);
+	DynamicMaterial->SetVectorParameterValue("Direction", -GetVelocity().GetSafeNormal());
 }
