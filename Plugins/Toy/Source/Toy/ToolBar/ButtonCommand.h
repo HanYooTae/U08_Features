@@ -14,8 +14,11 @@ public:
 
 private:
 	void SpawnVertexButton_Pressed();
+	void OPenViewerButton_Pressed();
 
 public:
 	TSharedPtr<FUICommandInfo> SpawnVertexButton;
+	TSharedPtr<FUICommandInfo> OpenViewerButton;
+
 	TSharedPtr<FUICommandList> SpawnVertexCommand;
 };

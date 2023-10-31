@@ -17,10 +17,12 @@ void FButtonCommand::RegisterCommands()
 {
 #define LOCTEXT_NAMESPACE ""
 	UI_COMMAND(SpawnVertexButton, "SpawnVertexButton", "Spawn Vertex Button", EUserInterfaceActionType::Button, FInputChord());
+	UI_COMMAND(OpenViewerButton, "OpenViewerButton", "Open Viewer Button", EUserInterfaceActionType::Button, FInputChord());
 #undef LOCTEXT_NAMESPACE
 
 	FExecuteAction executeAction = FExecuteAction::CreateRaw(this, &FButtonCommand::SpawnVertexButton_Pressed);
 	SpawnVertexCommand->MapAction(SpawnVertexButton, FExecuteAction::CreateRaw(this, &FButtonCommand::SpawnVertexButton_Pressed));
+	SpawnVertexCommand->MapAction(OpenViewerButton, FExecuteAction::CreateRaw(this, &FButtonCommand::OPenViewerButton_Pressed));
 }
 
 void FButtonCommand::SpawnVertexButton_Pressed()
@@ -32,4 +34,9 @@ void FButtonCommand::SpawnVertexButton_Pressed()
 	for (const auto& brush : brushes)
 		UE_LOG(LogTemp, Warning, L"%s", *brush->GetResourceName().ToString());
 
+}
+
+void FButtonCommand::OPenViewerButton_Pressed()
+{
+	UE_LOG(LogTemp, Warning, L"Open Viewer Button is Pressed");
 }

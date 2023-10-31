@@ -10,7 +10,8 @@ public:
 	virtual void ShutdownModule() override;
 
 private:
-	void AddToolBar(class FToolBarBuilder& InToolBarBuilder);
+	void AddToolBar_SpawnVertex(class FToolBarBuilder& InToolBarBuilder);
+	void AddToolBar_OpenViewer(class FToolBarBuilder& InToolBarBuilder);
 
 private:
 	TSharedPtr<FExtender> Extender;

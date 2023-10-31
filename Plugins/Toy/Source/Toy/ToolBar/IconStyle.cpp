@@ -1,24 +1,25 @@
 #include "IconStyle.h"
 #include "Styling/SlateStyle.h"
 #include "Interfaces/IPluginManager.h"
+#include "Styling/SlateStyleRegistry.h"
 
-TSharedPtr<IconStyle> Instance = nullptr;
+TSharedPtr<FIconStyle> FIconStyle::Instance = nullptr;
 
-TSharedPtr<IconStyle> IconStyle::Get()
+TSharedPtr<FIconStyle> FIconStyle::Get()
 {
 	if (Instance == nullptr)
-		Instance = MakeShareable(new IconStyle());
+		Instance = MakeShareable(new FIconStyle());
 
 	return Instance;
 }
 
-void IconStyle::Shutdown()
+void FIconStyle::Shutdown()
 {
 	if (Instance.IsValid())
 		Instance.Reset();
 }
 
-IconStyle::IconStyle()
+FIconStyle::FIconStyle()
 {
 	StyleSet = MakeShareable(new FSlateStyleSet(StyleSetName));
 
@@ -26,12 +27,26 @@ IconStyle::IconStyle()
 	path /= "Resources";
 	StyleSet->SetContentRoot(path);
 
-	FSlateImageBrush* brush = new FSlateImageBrush(path / "Icon.png", FVector2D(48));
+	RegisterIcon("SpawnVertex", path / "Icon.png", FVector2D(48), SpawnVertexButtonIcon);
+	RegisterIcon("OpenViewer", path / "Icon2.png", FVector2D(48), OpenViewerButtonIcon);
 
-	FString name = StyleSetName.ToString() + ".SpawnVertex";
-	StyleSet->Set(FName(name), brush);
+	FSlateStyleRegistry::RegisterSlateStyle(*StyleSet.Get());
 }
 
-IconStyle::~IconStyle()
+FIconStyle::~FIconStyle()
 {
+	if (StyleSet.IsValid() == false) return;
+
+	FSlateStyleRegistry::UnRegisterSlateStyle(*StyleSet.Get());
+	StyleSet.Reset();
+}
+
+void FIconStyle::RegisterIcon(const FString& InPostFix, const FString& InPath, const FVector2D& InSize, FSlateIcon& OutSlateIcon)
+{
+	FSlateImageBrush* brush = new FSlateImageBrush(InPath, InSize);
+
+	FString styleName = StyleSetName.ToString() + "." + InPostFix;
+	StyleSet->Set(FName(styleName), brush);
+
+	OutSlateIcon = FSlateIcon(StyleSetName, FName(styleName));
 }
