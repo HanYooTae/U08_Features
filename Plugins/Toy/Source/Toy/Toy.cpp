@@ -4,6 +4,8 @@
 #include "LevelEditor.h"
 #include "DebuggerCategory/DebuggerCategory.h"
 #include "GameplayDebugger.h"
+#include "DetailPannel/DetailsButton.h"
+#include "RHI/CButtonActor.h"
 //#include "Brushes/SlateImageBrush.h"
 
 #define LOCTEXT_NAMESPACE "FToyModule"
@@ -35,6 +37,16 @@ void FToyModule::StartupModule()
 		IGameplayDebugger::FOnGetCategory categoryDelegate = IGameplayDebugger::FOnGetCategory::CreateStatic(&FDebuggerCategory::MakeInstance);
 		gameplayDebugger.Get().RegisterCategory("AwesomData", categoryDelegate, EGameplayDebuggerCategoryState::EnabledInGameAndSimulate, 5);
 		gameplayDebugger.NotifyCategoriesChanged();
+	}
+
+	// Detail Panel Button
+	{
+		FPropertyEditorModule& propertyEditor = FModuleManager::LoadModuleChecked<FPropertyEditorModule>("PropertyEditor");
+		propertyEditor.RegisterCustomClassLayout
+		(
+			ACButtonActor::StaticClass()->GetFName(),
+			FOnGetDetailCustomizationInstance::CreateStatic(&FDetailsButton::MakeInstance)
+		)
 	}
 }
 
