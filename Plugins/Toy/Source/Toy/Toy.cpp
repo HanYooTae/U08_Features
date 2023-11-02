@@ -4,7 +4,7 @@
 #include "LevelEditor.h"
 #include "DebuggerCategory/DebuggerCategory.h"
 #include "GameplayDebugger.h"
-#include "DetailPannel/DetailsButton.h"
+#include "DetailPanel/DetailsButton.h"
 #include "RHI/CButtonActor.h"
 //#include "Brushes/SlateImageBrush.h"
 
@@ -46,7 +46,7 @@ void FToyModule::StartupModule()
 		(
 			ACButtonActor::StaticClass()->GetFName(),
 			FOnGetDetailCustomizationInstance::CreateStatic(&FDetailsButton::MakeInstance)
-		)
+		);
 	}
 }
 

@@ -6,7 +6,14 @@
 class TOY_API FDetailsButton : public IDetailCustomization
 {
 public:
-	TSharedRef<class IDetailCustomization> MakeInstance();
+	static TSharedRef<IDetailCustomization> MakeInstance();
 
 	virtual void CustomizeDetails(IDetailLayoutBuilder& DetailBuilder) override;
+
+private:
+	FReply OnClicked_ShuffleMaterial();
+	FReply OnClicked_SaveVertexData();
+
+private:
+	TArray<TWeakObjectPtr<UObject>> Objects;
 };
