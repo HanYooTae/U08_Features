@@ -6,6 +6,7 @@
 #include "Interfaces/IMainFrameModule.h"
 #include "DesktopPlatformModule.h"
 #include "IDesktopPlatform.h"
+#include "Serialization/BufferArchive.h"
 
 TSharedRef<IDetailCustomization> FDetailsButton::MakeInstance()
 {
@@ -78,14 +79,36 @@ FReply FDetailsButton::OnClicked_SaveVertexData()
 	//------------------------------------------------------------------------------------------------------------
 	// 	   @@ Load Vertex Data from SM_Asset
 	//------------------------------------------------------------------------------------------------------------
+	// -> Get SM Asset
 	ACButtonActor* actor = Cast<ACButtonActor>(Objects[0]);
 	UActorComponent* comp = actor->GetComponentByClass(UStaticMeshComponent::StaticClass());
 	UStaticMeshComponent* meshComp = Cast<UStaticMeshComponent>(comp);
 	if (meshComp == nullptr) return FReply::Unhandled();
 
+	UStaticMesh* meshAsset = meshComp->GetStaticMesh();
+	if (meshAsset == nullptr) return FReply::Unhandled();
+	FStaticMeshRenderData* renderData = meshAsset->RenderData.Get();
+	if(renderData->LODResources.Num() < 1) return FReply::Unhandled();
+	
+	// -> Get Vertex Data
+	FStaticMeshLODResources& lod = renderData->LODResources[0];
+	FPositionVertexBuffer& positionBuffer = lod.VertexBuffers.PositionVertexBuffer;
+	FStaticMeshVertexBuffer& metaBuffer = lod.VertexBuffers.StaticMeshVertexBuffer;
+	FColorVertexBuffer& colorBuffer = lod.VertexBuffers.ColorVertexBuffer;
+	FRawStaticIndexBuffer& indexBuffer = lod.IndexBuffer;
+
+	if (positionBuffer.GetNumVertices() < 1) return FReply::Unhandled();
+	if (indexBuffer.GetNumIndices() < 1) return FReply::Unhandled();
+	uint32 vertexCount = positionBuffer.GetNumVertices();
+	int32 indexCount = indexBuffer.GetNumIndices();		// -1ÀÌ¸é ÀÎµ¦½ºnull
+
+	GLog->Logf(L"Vertex Count : %d", vertexCount);
+	GLog->Logf(L"Index Count : %d", indexCount);
+
 	//------------------------------------------------------------------------------------------------------------
 	// 	   @@ Save File Dialog
 	//------------------------------------------------------------------------------------------------------------
+	// -> On Save File Dialog(WinAPI)
 	IMainFrameModule& mainFrame = FModuleManager::LoadModuleChecked<IMainFrameModule>("MainFrame");
 	void* handle = mainFrame.GetParentWindow()->GetNativeWindow()->GetOSWindowHandle();
 
@@ -97,7 +120,55 @@ FReply FDetailsButton::OnClicked_SaveVertexData()
 
 	if (fileNames.Num() < 1) return FReply::Unhandled();
 
-	GLog->Log(*fileNames[0]);
+	// -> Save File Archive
+	FVectexData data;
+
+	TArray<FColor> colors;
+	colorBuffer.GetVertexColors(colors);
+	if (colors.Num() < 1)
+	{
+		for (uint32 i = 0; i < vertexCount; i++)
+			colors.Add(FColor::White);
+	}
+
+	for (uint32 i = 0; i < vertexCount; i++)
+	{
+		data.Positions.Add(positionBuffer.VertexPosition(i));
+		data.Normals.Add(metaBuffer.VertexTangentZ(i));		// Normal vector
+		data.UVs.Add(metaBuffer.GetVertexUV(i, 0));
+		data.Colors.Add(colors[i]);
+	}
+
+	TArray<uint32> indices;
+	indexBuffer.GetCopy(indices);
+	data.Indices.Insert((int32*)indices.GetData(), indexCount, 0);
+
+	FBufferArchive buffer;
+
+	buffer << data;
+
+	// -> Save File(*.bin)
+	FFileHelper::SaveArrayToFile(buffer, *fileNames[0]);
+	buffer.FlushCache();
+	buffer.Empty();
+
+	FString str;
+	str.Append(FPaths::GetCleanFilename(fileNames[0]));
+	str.Append(" Binary File Saved");
+	GLog->Log(str);
+
+	// -> Save File(*.csv)
+	FString planeText;
+	for (uint32 i = 0; i < vertexCount; i++)
+	{
+		planeText.Append(data.Positions[i].ToString() + ",");
+		planeText.Append(data.Normals[i].ToString() + ",");
+		planeText.Append(data.UVs[i].ToString() + "\n");
+	}
+
+	FString planeTextPath = FPaths::GetBaseFilename(fileNames[0], false);
+	planeTextPath.Append(".csv");
+	FFileHelper::SaveStringToFile(planeText, *planeTextPath);
 
 	return FReply::Handled();
 }

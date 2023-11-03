@@ -1,5 +1,10 @@
 #include "ButtonCommand.h"
 #include "EditorStyleSet.h"
+#include "Interfaces/IMainFrameModule.h"
+#include "DesktopPlatformModule.h"
+#include "IDesktopPlatform.h"
+#include "Serialization/BufferArchive.h"
+#include "DetailPanel/DetailsButton.h"
 
 FButtonCommand::FButtonCommand()
 	:TCommands("ContextName", FText::FromString("ContextDesc"), NAME_None, FEditorStyle::GetStyleSetName())
@@ -27,13 +32,30 @@ void FButtonCommand::RegisterCommands()
 
 void FButtonCommand::SpawnVertexButton_Pressed()
 {
-	TArray<const FSlateBrush*> brushes;
-	FEditorStyle::GetResources(brushes);
-	//UE_LOG(LogTemp, Error, L"SpawnVertexButton_Pressed");
+	IMainFrameModule& mainFrame = FModuleManager::LoadModuleChecked<IMainFrameModule>("MainFrame");
+	void* handle = mainFrame.GetParentWindow()->GetNativeWindow()->GetOSWindowHandle();
 
-	for (const auto& brush : brushes)
-		UE_LOG(LogTemp, Warning, L"%s", *brush->GetResourceName().ToString());
+	FString path;
+	TArray<FString> fileNames;
 
+	IDesktopPlatform* platform = FDesktopPlatformModule::Get();
+	platform->OpenFileDialog(handle, "Load", path, "", "Binary File(*.bin) | *.bin", EFileDialogFlags::None, fileNames);
+
+	if (fileNames.Num() < 1) return;
+
+	FBufferArchive buffer;
+	FFileHelper::LoadFileToArray(buffer, *fileNames[0]);
+	FMemoryReader reader = FMemoryReader(buffer, true);
+
+	buffer.Seek(0);
+
+	FVectexData data;
+	reader << data;
+	reader.FlushCache();
+	reader.Close();
+
+	GLog->Logf(L"Vertex Count : %d", data.Positions.Num());
+	GLog->Logf(L"Index Count : %d", data.Indices.Num());
 }
 
 void FButtonCommand::OPenViewerButton_Pressed()
