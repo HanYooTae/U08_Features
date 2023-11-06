@@ -5,6 +5,7 @@
 #include "DebuggerCategory/DebuggerCategory.h"
 #include "GameplayDebugger.h"
 #include "DetailPanel/DetailsButton.h"
+#include "Viewer/MeshViewer.h"
 #include "RHI/CButtonActor.h"
 //#include "Brushes/SlateImageBrush.h"
 
@@ -58,6 +59,7 @@ void FToyModule::ShutdownModule()
 		IGameplayDebugger::Get().UnregisterCategory("AwesomData");
 
 	FIconStyle::Shutdown();
+	FMeshViewer::Shutdown();
 }
 
 void FToyModule::AddToolBar_SpawnVertex(FToolBarBuilder& InToolBarBuilder)
