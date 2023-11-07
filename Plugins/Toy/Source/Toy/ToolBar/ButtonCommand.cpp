@@ -88,7 +88,7 @@ void FButtonCommand::SpawnVertexButton_Pressed()
 	UWorld* world = GEditor->GetEditorWorldContext().World();
 	FHitResult hitResult;
 	FVector start = viewportClient->GetViewLocation();
-	FVector end = start + viewportClient->GetViewRotation().RotateVector(FVector(1e+4f, 0, 0));
+	FVector end = start + viewportClient->GetViewRotation().Vector() * 1e+4f; /*.RotateVector(FVector(1e+4f, 0, 0));*/
 
 	world->LineTraceSingleByChannel
 	(

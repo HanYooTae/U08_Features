@@ -1,6 +1,10 @@
 #include "MeshViewer.h"
 
 TSharedPtr<FMeshViewer> FMeshViewer::Instance = nullptr;
+const static FName ToolkitName = L"MeshViewer";
+const static FName ViewportTabID = L"Viewport";
+const static FName PreviewTabID = L"Preview";
+const static FName DetailsTabID = L"Details";
 
 void FMeshViewer::OpenWindow(UObject* InAsset)
 {
@@ -14,36 +18,105 @@ void FMeshViewer::OpenWindow(UObject* InAsset)
 	Instance->OpenWindow_Internal(InAsset);
 }
 
-void FMeshViewer::Shutdown(UObject* InAsset)
+void FMeshViewer::Shutdown()
 {
 	if (Instance.IsValid())
-		Instance.Reset();
+		Instance->CloseWindow();
+}
+
+void FMeshViewer::RegisterTabSpawners(const TSharedRef<FTabManager>& InTabManager)
+{
+	FAssetEditorToolkit::RegisterTabSpawners(InTabManager);
+
+	FOnSpawnTab viewportSpawnEvent = FOnSpawnTab::CreateSP(this, &FMeshViewer::SpawnViewportTab);
+	TabManager->RegisterTabSpawner(ViewportTabID, viewportSpawnEvent);
+}
+
+TSharedRef<SDockTab> FMeshViewer::SpawnViewportTab(const FSpawnTabArgs& InArgs)
+{
+	// TSharedRef<SWidget> <- SNew
+	return SNew(SDockTab)
+		[
+			SNew(SButton)
+			.Text(FText::FromString("Test"))
+		];
 }
 
 void FMeshViewer::OpenWindow_Internal(UObject* InAsset)
 {
-	TSharedPtr<FTabManager::FLayout> layout = FTabManager::NewLayout("MeshViewer_Layout")
+	// Create Layout
+	TSharedRef<FTabManager::FLayout> layout = FTabManager::NewLayout("MeshViewer_Layout")
 		->AddArea
 		(
-			FTabManager::NewPrimaryArea()
+			FTabManager::NewPrimaryArea()->SetOrientation(Orient_Vertical)
+			// Toolbar
+			->Split
+			(
+				FTabManager::NewStack()
+				->SetSizeCoefficient(0.1f)
+				->AddTab(GetToolbarTabId(), ETabState::OpenedTab)
+			)
+			// Panel(대)
+			->Split
+			(
+				FTabManager::NewSplitter()->SetOrientation(Orient_Horizontal)
+				
+				// (중) Viewport
+				->Split
+				(
+					FTabManager::NewStack()
+					->SetSizeCoefficient(0.75f)
+					->AddTab(ViewportTabID, ETabState::OpenedTab)
+				)
+				// END(중) Viewport
+
+				// (중) RightPanel
+				->Split
+				(
+					FTabManager::NewSplitter()->SetOrientation(Orient_Vertical)
+					->SetSizeCoefficient(0.25f)
+					// (소) Preview
+					->Split
+					(
+						FTabManager::NewStack()
+						->AddTab(PreviewTabID, ETabState::OpenedTab)
+					)
+					// (소) Details
+					->Split
+					(
+						FTabManager::NewStack()
+						->AddTab(DetailsTabID, ETabState::OpenedTab)
+					)
+				) // End(중) RightPanel
+			)//END(대)
 		);
 
-	FAssetEditorToolkit::InitAssetEditor(EToolkitMode::Standalone/*별도의 창으로*/, TSharedPtr<IToolkitHost>(), ToolkitName, layout, true/*검색창*/, true/*툴바아이콘*/, InAsset);
+	// Open Slate Window
+	FAssetEditorToolkit::InitAssetEditor
+	(
+		EToolkitMode::Standalone/*별도의 창으로*/,
+		TSharedPtr<IToolkitHost>(),
+		ToolkitName,
+		layout,
+		true/*검색창*/,
+		true/*툴바아이콘*/,
+		InAsset
+	);
 }
 
 FName FMeshViewer::GetToolkitFName() const
 {
-	return FName();
+	return ToolkitName;
 }
 
 FText FMeshViewer::GetBaseToolkitName() const
 {
-	return FText();
+	return FText::FromName(ToolkitName);
 }
 
 FString FMeshViewer::GetWorldCentricTabPrefix() const
 {
-	return FString();
+	return ToolkitName.ToString();
 }
 
 FLinearColor FMeshViewer::GetWorldCentricTabColorScale(void) const

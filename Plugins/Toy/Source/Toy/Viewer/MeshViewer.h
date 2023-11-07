@@ -7,7 +7,13 @@ class TOY_API FMeshViewer : public FAssetEditorToolkit
 {
 public:
 	static void OpenWindow(UObject* InAsset);
-	static void Shutdown(UObject* InAsset);
+	static void Shutdown();
+
+public:
+	virtual void RegisterTabSpawners(const TSharedRef<FTabManager>& InTabManager) override;
+
+private:
+	TSharedRef<SDockTab> SpawnViewportTab(const FSpawnTabArgs& InArgs);
 
 private:
 	void OpenWindow_Internal(UObject* InAsset);

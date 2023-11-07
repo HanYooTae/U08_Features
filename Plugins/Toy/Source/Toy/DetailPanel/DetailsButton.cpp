@@ -22,7 +22,7 @@ void FDetailsButton::CustomizeDetails(IDetailLayoutBuilder& DetailBuilder)
 	category.AddCustomRow(FText::FromString("Shuffle Material"))
 	.NameContent()
 	[
-		SNew(STextBlock)
+		SNew(STextBlock)	// TSharedRef<SWidget> <- SNew
 		.Text(FText::FromString("Shuffle Material"))
 	]
 	.ValueContent()
