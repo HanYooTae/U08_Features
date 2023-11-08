@@ -14,6 +14,8 @@ public:
 
 private:
 	TSharedRef<SDockTab> SpawnViewportTab(const FSpawnTabArgs& InArgs);
+	TSharedRef<SDockTab> SpawnPreviewSceneSettingsTab(const FSpawnTabArgs& InArgs);
+	TSharedRef<SDockTab> SpawnDetailsViewTab(const FSpawnTabArgs& InArgs);
 
 private:
 	void OpenWindow_Internal(UObject* InAsset);
@@ -26,4 +28,9 @@ public:
 
 private:
 	static TSharedPtr<FMeshViewer> Instance;
+
+private:
+	TSharedPtr<class SMeshViewer_Viewport> ViewportWidget;
+	TSharedPtr<class SWidget> PreviewSceneSettingsWidget;
+	TSharedPtr<class IDetailsView> DetailsViewWidget;
 };

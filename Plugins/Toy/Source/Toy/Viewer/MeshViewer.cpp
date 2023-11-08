@@ -1,4 +1,6 @@
 #include "MeshViewer.h"
+#include "MeshViewer_Viewport.h"
+#include "AdvancedPreviewSceneModule.h"
 
 TSharedPtr<FMeshViewer> FMeshViewer::Instance = nullptr;
 const static FName ToolkitName = L"MeshViewer";
@@ -30,6 +32,12 @@ void FMeshViewer::RegisterTabSpawners(const TSharedRef<FTabManager>& InTabManage
 
 	FOnSpawnTab viewportSpawnEvent = FOnSpawnTab::CreateSP(this, &FMeshViewer::SpawnViewportTab);
 	TabManager->RegisterTabSpawner(ViewportTabID, viewportSpawnEvent);
+
+	FOnSpawnTab previewSpawnEvent = FOnSpawnTab::CreateSP(this, &FMeshViewer::SpawnPreviewSceneSettingsTab);
+	TabManager->RegisterTabSpawner(PreviewTabID, previewSpawnEvent);
+
+	FOnSpawnTab detailsSpawnEvent = FOnSpawnTab::CreateSP(this, &FMeshViewer::SpawnDetailsViewTab);
+	TabManager->RegisterTabSpawner(DetailsTabID, detailsSpawnEvent);
 }
 
 TSharedRef<SDockTab> FMeshViewer::SpawnViewportTab(const FSpawnTabArgs& InArgs)
@@ -37,13 +45,39 @@ TSharedRef<SDockTab> FMeshViewer::SpawnViewportTab(const FSpawnTabArgs& InArgs)
 	// TSharedRef<SWidget> <- SNew
 	return SNew(SDockTab)
 		[
-			SNew(SButton)
-			.Text(FText::FromString("Test"))
+			ViewportWidget.ToSharedRef()
+		];
+}
+
+TSharedRef<SDockTab> FMeshViewer::SpawnPreviewSceneSettingsTab(const FSpawnTabArgs& InArgs)
+{
+	return SNew(SDockTab)
+		[
+			PreviewSceneSettingsWidget.ToSharedRef()
+		];
+}
+
+TSharedRef<SDockTab> FMeshViewer::SpawnDetailsViewTab(const FSpawnTabArgs& InArgs)
+{
+	return SNew(SDockTab)
+		[
+			DetailsViewWidget.ToSharedRef()
 		];
 }
 
 void FMeshViewer::OpenWindow_Internal(UObject* InAsset)
 {
+	//Create SlateWidget
+	ViewportWidget = SNew(SMeshViewer_Viewport);
+
+	FAdvancedPreviewSceneModule& previewSceneSettings = FModuleManager::LoadModuleChecked<FAdvancedPreviewSceneModule>("AdvancedPreviewScene");
+	PreviewSceneSettingsWidget = previewSceneSettings.CreateAdvancedPreviewSceneSettingsWidget(ViewportWidget->GetScene());
+
+	FPropertyEditorModule& properyEditor = FModuleManager::LoadModuleChecked<FPropertyEditorModule>("PropertyEditor");
+	FDetailsViewArgs args(false, false, true, FDetailsViewArgs::ObjectsUseNameArea);
+	DetailsViewWidget = properyEditor.CreateDetailView(args);
+	DetailsViewWidget->SetObject(InAsset);
+
 	// Create Layout
 	TSharedRef<FTabManager::FLayout> layout = FTabManager::NewLayout("MeshViewer_Layout")
 		->AddArea

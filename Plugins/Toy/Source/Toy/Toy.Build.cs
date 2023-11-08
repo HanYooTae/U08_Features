@@ -26,7 +26,9 @@ public class Toy : ModuleRules
 				"MainFrame",
 				"DesktopPlatform",
 				"U08_Features",
-				"UnrealEd"
+				"UnrealEd",
+				"AdvancedPreviewScene",
+				"InputCore"
 			}
 			);
 	}
