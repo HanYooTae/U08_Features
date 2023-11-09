@@ -7,6 +7,8 @@
 #include "DetailPanel/DetailsButton.h"
 #include "Viewer/MeshViewer.h"
 #include "RHI/CButtonActor.h"
+#include "AssetToolsModule.h"
+#include "AssetTools/CAssetAction.h"
 //#include "Brushes/SlateImageBrush.h"
 
 #define LOCTEXT_NAMESPACE "FToyModule"
@@ -48,6 +50,16 @@ void FToyModule::StartupModule()
 			ACButtonActor::StaticClass()->GetFName(),
 			FOnGetDetailCustomizationInstance::CreateStatic(&FDetailsButton::MakeInstance)
 		);
+	}
+
+	// AssetTypeAction
+	{
+		IAssetTools& assetTools = FModuleManager::LoadModuleChecked<FAssetToolsModule>("AssetTools").Get();
+
+		//EAssetTypeCategories::Type category = EAssetTypeCategories::Misc;
+		EAssetTypeCategories::Type category = assetTools.RegisterAdvancedAssetCategory(FName("MyKey"), FText::FromString("Awesome Category"));
+		AssetTypeActions = MakeShareable(new CAssetAction(category));
+		assetTools.RegisterAssetTypeActions(AssetTypeActions.ToSharedRef());
 	}
 }
 

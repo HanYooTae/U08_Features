@@ -1,0 +1,2 @@
+#include "CAsset.h"
+

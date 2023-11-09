@@ -28,7 +28,8 @@ public class Toy : ModuleRules
 				"U08_Features",
 				"UnrealEd",
 				"AdvancedPreviewScene",
-				"InputCore"
+				"InputCore",
+				"AssetTools"
 			}
 			);
 	}
